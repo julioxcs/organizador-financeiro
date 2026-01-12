@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizador Financeiro Avançado</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Organizador Financeiro e Apostas</h1>
+  </header>
+
+  <main>
+    <!-- Financeiro -->
+    <section id="financeiro">
+      <h2>Financeiro</h2>
+      <form id="form-financeiro">
+        <input type="text" id="descricao" placeholder="Descrição" required>
+        <input type="number" id="valor" placeholder="Valor" required>
+        <input type="date" id="data-financeiro" required>
+        <input type="file" id="foto-financeiro" accept="image/*">
+        <select id="tipo">
+          <option value="entrada">Entrada</option>
+          <option value="saida">Saída</option>
+        </select>
+        <button type="submit">Adicionar</button>
+      </form>
+      <h3>Saldo: <span id="saldo">0</span></h3>
+      <ul id="historico"></ul>
+    </section>
+
+    <!-- Apostas -->
+    <section id="apostas">
+      <h2>Apostas</h2>
+      <form id="form-apostas">
+        <input type="text" id="aposta-nome" placeholder="Descrição da aposta" required>
+        <input type="number" id="aposta-valor" placeholder="Valor da aposta" required>
+        <input type="date" id="data-aposta" required>
+        <input type="file" id="foto-aposta" accept="image/*">
+        <select id="aposta-resultado">
+          <option value="ganhou">Ganhou</option>
+          <option value="perdeu">Perdeu</option>
+        </select>
+        <button type="submit">Adicionar Aposta</button>
+      </form>
+      <ul id="historico-apostas"></ul>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
