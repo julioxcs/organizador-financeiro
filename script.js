@@ -1,157 +1,130 @@
-// ===== Helper =====
-function salvarLocalStorage(chave, dados){
-  localStorage.setItem(chave, JSON.stringify(dados));
+const salvar=(k,d)=>localStorage.setItem(k,JSON.stringify(d))
+const carregar=k=>JSON.parse(localStorage.getItem(k))||[]
+const dataBR=d=>new Date(d).toLocaleDateString("pt-BR")
+
+// MODAL
+const modal=document.getElementById("modalImg")
+const modalImg=document.getElementById("modalImgSrc")
+window.abrirImg=src=>{modal.style.display="flex";modalImg.src=src}
+modal.onclick=()=>modal.style.display="none"
+
+// FINANCEIRO
+const formF=document.getElementById("form-financeiro")
+const histF=document.getElementById("historico")
+const saldoSpan=document.getElementById("saldo")
+const desc=document.getElementById("descricao")
+const val=document.getElementById("valor")
+const tipo=document.getElementById("tipo")
+const dataF=document.getElementById("data-financeiro")
+const fotoF=document.getElementById("foto-financeiro")
+
+let listaF=carregar("financeiro")
+
+const saldo=()=>saldoSpan.textContent=
+  listaF.reduce((a,i)=>a+(i.tipo==="entrada"?i.valor:-i.valor),0)
+
+const renderF=()=>{
+  histF.innerHTML=""
+  listaF.forEach((i,idx)=>{
+    histF.innerHTML+=`
+    <li>
+      <strong>${dataBR(i.data)}</strong> - ${i.descricao} (${i.tipo}) R$${i.valor}
+      ${i.fotos?.length?`
+        <div class="galeria">
+          ${i.fotos.map(f=>`<img src="${f}" onclick="abrirImg('${f}')">`).join("")}
+        </div>`:""}
+      <button class="delete" onclick="delF(${idx})">Remover</button>
+    </li>`
+  })
+  saldo()
 }
 
-function carregarLocalStorage(chave){
-  return JSON.parse(localStorage.getItem(chave)) || [];
-}
+window.delF=i=>{listaF.splice(i,1);salvar("financeiro",listaF);renderF()}
 
-// ===== FINANCEIRO =====
-const formFinanceiro = document.getElementById("form-financeiro");
-const historico = document.getElementById("historico");
-const saldoSpan = document.getElementById("saldo");
+formF.onsubmit=e=>{
+  e.preventDefault()
+  const fotos=[]
+  const files=[...fotoF.files]
 
-let saldo = 0;
-let financeiroLista = carregarLocalStorage("financeiro");
-
-function atualizarSaldo(){
-  saldo = financeiroLista.reduce((acc, item) => acc + (item.tipo === "entrada" ? item.valor : -item.valor), 0);
-  saldoSpan.textContent = saldo;
-}
-
-function criarLiFinanceiro(item, index){
-  const li = document.createElement("li");
-
-  li.innerHTML = `
-    ${item.foto ? `<img src="${item.foto}">` : ""}
-    ${item.data} - ${item.descricao}: ${item.tipo === "entrada" ? "+" : "-"} R$${item.valor}
-    <button class="edit">Editar</button>
-    <button class="delete">Remover</button>
-  `;
-
-  li.querySelector(".delete").addEventListener("click", ()=>{
-    financeiroLista.splice(index,1);
-    salvarLocalStorage("financeiro", financeiroLista);
-    renderizarFinanceiro();
-  });
-
-  li.querySelector(".edit").addEventListener("click", ()=>{
-    document.getElementById("descricao").value = item.descricao;
-    document.getElementById("valor").value = item.valor;
-    document.getElementById("tipo").value = item.tipo;
-    document.getElementById("data-financeiro").value = item.data;
-    financeiroLista.splice(index,1);
-    salvarLocalStorage("financeiro", financeiroLista);
-    renderizarFinanceiro();
-  });
-
-  return li;
-}
-
-function renderizarFinanceiro(){
-  historico.innerHTML = "";
-  financeiroLista.forEach((item, i)=>{
-    historico.appendChild(criarLiFinanceiro(item,i));
-  });
-  atualizarSaldo();
-}
-
-formFinanceiro.addEventListener("submit", function(e){
-  e.preventDefault();
-  const descricao = document.getElementById("descricao").value;
-  const valor = Number(document.getElementById("valor").value);
-  const tipo = document.getElementById("tipo").value;
-  const data = document.getElementById("data-financeiro").value;
-  const fotoInput = document.getElementById("foto-financeiro");
-
-  let foto = "";
-  if(fotoInput.files && fotoInput.files[0]){
-    const reader = new FileReader();
-    reader.onload = function(e){
-      foto = e.target.result;
-      financeiroLista.push({descricao, valor, tipo, foto, data});
-      salvarLocalStorage("financeiro", financeiroLista);
-      renderizarFinanceiro();
-      formFinanceiro.reset();
-    }
-    reader.readAsDataURL(fotoInput.files[0]);
-  } else {
-    financeiroLista.push({descricao, valor, tipo, foto, data});
-    salvarLocalStorage("financeiro", financeiroLista);
-    renderizarFinanceiro();
-    formFinanceiro.reset();
+  const salvarItem=()=>{
+    listaF.push({
+      descricao:desc.value,
+      valor:+val.value,
+      tipo:tipo.value,
+      data:dataF.value,
+      fotos
+    })
+    salvar("financeiro",listaF)
+    renderF()
+    formF.reset()
   }
-});
 
-renderizarFinanceiro();
-
-// ===== APOSTAS =====
-const formApostas = document.getElementById("form-apostas");
-const historicoApostas = document.getElementById("historico-apostas");
-
-let apostasLista = carregarLocalStorage("apostas");
-
-function criarLiAposta(item,index){
-  const li = document.createElement("li");
-  li.innerHTML = `
-    ${item.foto ? `<img src="${item.foto}">` : ""}
-    ${item.data} - ${item.nome} - R$${item.valor} - ${item.resultado}
-    <button class="edit">Editar</button>
-    <button class="delete">Remover</button>
-  `;
-
-  li.querySelector(".delete").addEventListener("click", ()=>{
-    apostasLista.splice(index,1);
-    salvarLocalStorage("apostas", apostasLista);
-    renderizarApostas();
-  });
-
-  li.querySelector(".edit").addEventListener("click", ()=>{
-    document.getElementById("aposta-nome").value = item.nome;
-    document.getElementById("aposta-valor").value = item.valor;
-    document.getElementById("aposta-resultado").value = item.resultado;
-    document.getElementById("data-aposta").value = item.data;
-    apostasLista.splice(index,1);
-    salvarLocalStorage("apostas", apostasLista);
-    renderizarApostas();
-  });
-
-  return li;
+  if(files.length){
+    let l=0
+    files.forEach(f=>{
+      const r=new FileReader()
+      r.onload=e=>{fotos.push(e.target.result);if(++l===files.length)salvarItem()}
+      r.readAsDataURL(f)
+    })
+  }else salvarItem()
 }
 
-function renderizarApostas(){
-  historicoApostas.innerHTML = "";
-  apostasLista.forEach((item,i)=>{
-    historicoApostas.appendChild(criarLiAposta(item,i));
-  });
+renderF()
+
+// APOSTAS
+const formA=document.getElementById("form-apostas")
+const histA=document.getElementById("historico-apostas")
+const nomeA=document.getElementById("aposta-nome")
+const valA=document.getElementById("aposta-valor")
+const resA=document.getElementById("aposta-resultado")
+const dataA=document.getElementById("data-aposta")
+const fotoA=document.getElementById("foto-aposta")
+
+let listaA=carregar("apostas")
+
+const renderA=()=>{
+  histA.innerHTML=""
+  listaA.forEach((i,idx)=>{
+    histA.innerHTML+=`
+    <li>
+      <strong>${dataBR(i.data)}</strong> - ${i.nome} R$${i.valor} (${i.resultado})
+      ${i.fotos?.length?`
+        <div class="galeria">
+          ${i.fotos.map(f=>`<img src="${f}" onclick="abrirImg('${f}')">`).join("")}
+        </div>`:""}
+      <button class="delete" onclick="delA(${idx})">Remover</button>
+    </li>`
+  })
 }
 
-formApostas.addEventListener("submit", function(e){
-  e.preventDefault();
-  const nome = document.getElementById("aposta-nome").value;
-  const valor = Number(document.getElementById("aposta-valor").value);
-  const resultado = document.getElementById("aposta-resultado").value;
-  const data = document.getElementById("data-aposta").value;
-  const fotoInput = document.getElementById("foto-aposta");
+window.delA=i=>{listaA.splice(i,1);salvar("apostas",listaA);renderA()}
 
-  let foto = "";
-  if(fotoInput.files && fotoInput.files[0]){
-    const reader = new FileReader();
-    reader.onload = function(e){
-      foto = e.target.result;
-      apostasLista.push({nome, valor, resultado, foto, data});
-      salvarLocalStorage("apostas", apostasLista);
-      renderizarApostas();
-      formApostas.reset();
-    }
-    reader.readAsDataURL(fotoInput.files[0]);
-  } else {
-    apostasLista.push({nome, valor, resultado, foto, data});
-    salvarLocalStorage("apostas", apostasLista);
-    renderizarApostas();
-    formApostas.reset();
+formA.onsubmit=e=>{
+  e.preventDefault()
+  const fotos=[]
+  const files=[...fotoA.files]
+
+  const salvarItem=()=>{
+    listaA.push({
+      nome:nomeA.value,
+      valor:+valA.value,
+      resultado:resA.value,
+      data:dataA.value,
+      fotos
+    })
+    salvar("apostas",listaA)
+    renderA()
+    formA.reset()
   }
-});
 
-renderizarApostas();
+  if(files.length){
+    let l=0
+    files.forEach(f=>{
+      const r=new FileReader()
+      r.onload=e=>{fotos.push(e.target.result);if(++l===files.length)salvarItem()}
+      r.readAsDataURL(f)
+    })
+  }else salvarItem()
+}
+
+renderA()
