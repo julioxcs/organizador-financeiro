@@ -3,48 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizador Financeiro</title>
+  <title>Controle de Apostas</title>
+
+  <!-- FAVICON PREMIUM (EMBUTIDO) -->
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <rect width="100" height="100" rx="20" fill="%23111827"/>
+    <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle"
+      font-size="52" fill="white" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+      $
+    </text>
+  </svg>'>
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h1>Organizador Financeiro e Apostas</h1>
+  <h1>Controle de Apostas</h1>
 </header>
 
 <main>
-  <section>
-    <h2>Financeiro</h2>
-    <form id="form-financeiro">
-      <input type="text" id="descricao" placeholder="Descrição" required>
-      <input type="number" id="valor" placeholder="Valor" required>
-      <input type="date" id="data-financeiro" required>
-      <input type="file" id="foto-financeiro" accept="image/*" multiple>
-      <select id="tipo">
-        <option value="entrada">Entrada</option>
-        <option value="saida">Saída</option>
-      </select>
-      <button>Adicionar</button>
-    </form>
-    <h3>Saldo: R$ <span id="saldo">0</span></h3>
-    <ul id="historico"></ul>
-  </section>
 
+  <!-- APOSTAS -->
   <section>
     <h2>Apostas</h2>
+
     <form id="form-apostas">
-      <input type="text" id="aposta-nome" placeholder="Descrição" required>
-      <input type="number" id="aposta-valor" placeholder="Valor" required>
-      <input type="date" id="data-aposta" required>
-      <input type="file" id="foto-aposta" accept="image/*" multiple>
+      <input type="text" id="aposta-nome" placeholder="Descrição da aposta" required>
+
+      <input type="number" id="aposta-movimentado" placeholder="Valor movimentado" required>
+
+      <input type="number" id="aposta-resultado-valor" placeholder="Resultado apenas" required>
+
+      <input type="date" id="aposta-data" required>
+
+      <input type="file" id="aposta-fotos" accept="image/*" multiple>
+
       <select id="aposta-resultado">
         <option value="ganhou">Ganhou</option>
         <option value="perdeu">Perdeu</option>
       </select>
-      <button>Adicionar</button>
+
+      <button type="submit">Salvar Aposta</button>
     </form>
-    <ul id="historico-apostas"></ul>
+
+    <ul id="lista-apostas" class="accordion"></ul>
   </section>
+
+  <!-- COMPROVANTES -->
+  <section>
+    <h2>Comprovantes</h2>
+
+    <form id="form-comp">
+      <input type="text" id="comp-desc" placeholder="Descrição do comprovante" required>
+      <input type="date" id="comp-data" required>
+      <input type="file" id="comp-fotos" accept="image/*" multiple>
+      <button type="submit">Salvar Comprovante</button>
+    </form>
+
+    <ul id="lista-comp" class="accordion"></ul>
+  </section>
+
 </main>
 
 <div class="modal-img" id="modalImg">
